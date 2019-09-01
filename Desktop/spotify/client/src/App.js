@@ -12,6 +12,8 @@ class App extends Component {
   spotifyWebApi.setAccessToken(params.access_token);
   this.state = {
     userPlaylists : [],
+    nameArray: [],
+    sortedArray: [],
     playlistOne : {
       collaborative: false,
       external_urls: null,
@@ -44,28 +46,22 @@ class App extends Component {
  getUsersPlaylists() {
   spotifyWebApi.getUserPlaylists()
     .then((response) => {
+      var arr = []
+      response.items.map((x, i) => {
+        arr.push(x.name)
+      })
+      arr.sort()
       this.setState({
-        userPlaylists: Array.from(response.items),
+        userPlaylists: Array.from(arr),
       })
     }
     )
- }
- onClick1 = (playlist) => {
-   if (this.state.check1 === false) {
-     this.setState({
-       playlistOne : playlist,
-       check1: true,
-       pName: playlist.name
-     }, () => {
-       console.log(this.state.pName);
-     })
-   }
  }
 
 
  render() {
   this.getUsersPlaylists()
-  return <Router history={browserHistory}>
+  return <Router>
    <Route exact path = "/" render = {
      () => {
        return (
@@ -82,25 +78,15 @@ class App extends Component {
        return (
          <div>
            {this.state.userPlaylists.map((x, index) =>
-              <a href = 'http://localhost:3000/result/#'>
-             <button key = {index} onClick = { () => this.onClick1(x)}>
-               {x.name}
+             <button key = {index}>
+               {x}
              </button>
-             </a>
            )}
          </div>
        )
      }
    }/>
-   <Route exact path = "/result" render = {
-     () => {
-       return (
-        <h1>Playlist name: {browserHistory.push({state: {pName: this.state.pName}})}</h1>
-       )
-     }
-   }/>
    </Router>
-}
+  }
 }
 export default App;
-
